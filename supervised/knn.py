@@ -1,6 +1,11 @@
 import numpy as np
 import operator
 
+
+## TODO: transformar em uma classe
+## TODO: criar metodos de classificacao e regressao
+## TODO: receber pesos para features?
+
 def createDataset():
     group = np.array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
     labels = ['A', 'A', 'B', 'B']
