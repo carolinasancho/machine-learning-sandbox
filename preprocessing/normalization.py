@@ -13,6 +13,7 @@ def norm(dataset):
 def test_norm():
     a = np.array([[15.0,15.0,15.0],[10.0,10.0,10.0],[5.0,5.0,5.0],[1.0,1.0,1.0]])
     d, r, m = norm(a)
+    print a
     print d
 
 if __name__ == '__main__':
