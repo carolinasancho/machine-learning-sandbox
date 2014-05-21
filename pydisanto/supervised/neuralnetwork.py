@@ -18,19 +18,14 @@ class NeuralNetwork():
         return a
 
 def sigmoid(z):
-    return 1.0/(1 + np.exp(-z))
+    return 1.0/(1.0 + np.exp(-z))
 
 sigmoid_vec = np.vectorize(sigmoid)
 
 def test_nn():
     net = NeuralNetwork([2,3,1])
-    print net.biases
-    print net.weights
-    print len(zip(net.biases, net.weights))
-
-
-    #print net.biases
-    #print net.weights
+    i =  np.array([[2,2]])
+    print net.feedforward(i.T)
 
 if __name__ == '__main__':
     test_nn()
