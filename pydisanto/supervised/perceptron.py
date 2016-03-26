@@ -1,49 +1,58 @@
-import numpy
+import numpy as np
 
 class Perceptron(object):
+    """Perceptron classifier.
 
-    def __init__(self, learning_rate=0.25, niterations=10):
+    Parameters
+    ----------
+    learning_rate: float
+        Learning rate (between 0.0 and 1.0)
+    niterations: int
+        Number of iterations over the training set
+
+    Attributes
+    ----------
+    weights_: 1-d array
+        Weights after fitting
+    errors_: list
+        Number of erros in each iterations
+    """
+
+    def __init__(self, learning_rate=0.01, niterations=10):
         self.learning_rate = learning_rate
-        self.number_of_iterations = niterations
+        self.niterations = niterations
 
-    def _initWeights(self, X, Y):
-        if (numpy.ndim(X) > 1):
-            self.number_of_features = numpy.shape(X)[1]
-        else:
-            self.number_of_features = 1
-        if (numpy.ndim(Y) > 1):
-            self.number_of_classes = numpy.shape(Y)[1]
-        else:
-            self.number_of_classes = 1
-        self.train_size = numpy.shape(X)[0]
-        self.weights = numpy.random.rand(self.number_of_features+1,self.number_of_classes)*0.1-0.05
+    def fit(self, X, y):
+        """Fit the training data.
 
-    def learn(self,X,Y):
-        self._initWeights(X,Y)
-        # add the inputs to the bias node
-        X = numpy.concatenate((X, -numpy.ones((self.train_size,1))), axis=1)
-        change = range(self.train_size)
-        for i in xrange(self.number_of_iterations):
-            self.outputs = self._forward(X)
-            self.weights += self.learning_rate*numpy.dot(X.T,Y-self.outputs)
-            numpy.random.shuffle(change)
-            X = X[change,:]
-            Y = Y[change,:]
+        Parameters
+        ----------
+        X: {array-like}, shape = [number of instances, number of features]
+            Training matrix
+        y: array-like, shape = [number of instances]
+            Target values
 
-    def _forward(self, X):
-        outputs = numpy.dot(X, self.weights)
-        return numpy.where(outputs > 0, 1, 0)
+        Returns
+        -------
+        self: object
+        """
+        self.weights_ = np.zeros(1 + X.shape[1])
+        self.errors_ = []
+
+        for _ in range(self.niterations):
+            errors = 0
+            for xi, target in zip(X, y):
+                update = self.learning_rate * (target - self.predict(xi))
+                self.weights_[1:] += update * xi
+                self.weights_[0] += update
+                errors += int(update != 0.0)
+            self.errors_.append(errors)
+        return self
+
+    def net_input(self, X):
+        """Calculate net input"""
+        return np.dot(X, self.weights_[1:]) + self.weights_[0]
 
     def predict(self, X):
-        X = numpy.concatenate((X, -numpy.ones((self.train_size,1))), axis=1)
-        return self._forward(X)
-
-def main():
-    # AND logic function example 
-    a = numpy.array([[0,0,0],[0,1,0],[1,0,0],[1,1,1]])
-    p  = Perceptron()
-    p.learn(a[:,0:2],a[:,2:])
-    print p.predict(a[:,0:2])
-
-if __name__ == '__main__':
-    main()
+        """Return class label after unit step"""
+        return np.where(self.net_input(X) >= 0.0, 1, -1)
